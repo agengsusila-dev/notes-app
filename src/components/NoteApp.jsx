@@ -1,8 +1,10 @@
 import React from "react";
+
 import { getInitialData } from "../utils";
 import NoteHeader from "./NoteHeader";
 import NotesActive from "./NotesActive";
 import NotesArchive from "./NotesArchive";
+import NoteInput from "./NoteInput";
 
 class NoteApp extends React.Component {
   constructor(props) {
@@ -15,14 +17,18 @@ class NoteApp extends React.Component {
     this.onSearchHandler = this.onSearchHandler.bind(this);
     this.onDeleteHandler = this.onDeleteHandler.bind(this);
     this.onArchiveHandler = this.onArchiveHandler.bind(this);
+    this.onAddNoteHandler = this.onAddNoteHandler.bind(this);
   }
 
   onSearchHandler(inputQuery) {
-    this.setState(() => {
-      return {
-        searchQuery: inputQuery,
-      };
-    });
+    if (inputQuery.trim() === "") {
+      this.setState({ notes: getInitialData() });
+    } else {
+      const filteredNotes = this.state.notes.filter((notes) => {
+        return notes.title.toLowerCase().includes(inputQuery.toLowerCase());
+      });
+      this.setState({ notes: filteredNotes });
+    }
   }
 
   onArchiveHandler(id) {
@@ -37,6 +43,23 @@ class NoteApp extends React.Component {
     this.setState({ notes });
   }
 
+  onAddNoteHandler({ title, body }) {
+    this.setState((prevState) => {
+      return {
+        notes: [
+          ...prevState.notes,
+          {
+            id: +new Date(),
+            title,
+            body,
+            createdAt: new Date().toISOString(),
+            archived: false,
+          },
+        ],
+      };
+    });
+  }
+
   render() {
     const notes = this.state.notes;
     const activeNotes = notes.filter((note) => {
@@ -48,8 +71,9 @@ class NoteApp extends React.Component {
 
     return (
       <div className="note-app">
-        <NoteHeader searchNote={this.onSearchHandler} />
+        <NoteHeader onSearch={this.onSearchHandler} />
         <div className="note-app__body">
+          <NoteInput addNote={this.onAddNoteHandler} />
           <h2>Active Notes</h2>
           <NotesActive
             notes={activeNotes}

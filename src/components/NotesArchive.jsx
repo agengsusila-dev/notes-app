@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import NotesItem from "./NotesItem";
 
-function NotesArchive({ notes, onDelete, onArchive }) {
+function NotesArchive({ notes, onDelete, onArchive, onActive }) {
   return (
     <div className="notes-list">
       {notes.length === 0 ? (
@@ -11,6 +11,7 @@ function NotesArchive({ notes, onDelete, onArchive }) {
           <NotesItem
             key={note.id}
             id={note.id}
+            onActive={onActive}
             onDelete={onDelete}
             onArchive={onArchive}
             isArchive={note.archived}
