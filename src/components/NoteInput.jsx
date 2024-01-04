@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from "react";
+import { Toaster, toast } from "react-hot-toast";
 
 class NoteInput extends React.Component {
   constructor(props) {
@@ -16,9 +17,14 @@ class NoteInput extends React.Component {
   }
 
   onTitleChangeHandler(event) {
+    const title = event.target.value;
+    const charLimit = 50;
+
+    if (title.length > charLimit) return;
+
     this.setState(() => {
       return {
-        title: event.target.value.slice(0, this.state.charLimit),
+        title,
       };
     });
   }
@@ -33,6 +39,10 @@ class NoteInput extends React.Component {
 
   onSubmitHandler(event) {
     event.preventDefault();
+    if (this.state.title === "" && this.state.body === "") {
+      toast.error("Note's title and body cannot be empty!", { icon: "😑" });
+      return;
+    }
     this.props.addNote(this.state);
     this.setState({
       title: "",
@@ -44,6 +54,7 @@ class NoteInput extends React.Component {
     const charLimit = 50;
     return (
       <form className="note-input" onSubmit={this.onSubmitHandler}>
+        <Toaster />
         <h2 className="note-input-title">Make a Note</h2>
         <p className="note-input__title__char-limit">
           Remaining Characters: {charLimit - this.state.title.length}
